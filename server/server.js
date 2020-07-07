@@ -31,7 +31,7 @@ io.on("connection", (socket) => {
     });
   });
 
-  // after
+  // after accepting the signal of the user joining the room, send out a signal to that new user
   socket.on("returning signal", ({ userInRoomSignal, callerId }) => {
     io.to(callerId).emit("receiving returned signal", {
       userInRoomSignal,
@@ -39,6 +39,7 @@ io.on("connection", (socket) => {
     });
   });
 
+  // handle deleting users from a given room
   socket.on("disconnect", () => {
     const roomId = socketToRoom[socket.id];
     let room = users[roomId];
