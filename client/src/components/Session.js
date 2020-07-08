@@ -26,6 +26,7 @@ function Session() {
         socket.on("get all users", (userList) => {
           const peerList = [];
           userList.forEach((user) => {
+            // in this case, user = socket id of the user already in a room
             const userInRoom = createPeer(user, socket.id, stream);
             peersRef.current.push({
               peerId: user,
@@ -70,6 +71,9 @@ function Session() {
     };
   }, []);
 
+  // userToSignal = socket id of a user already in a room
+  // callerId = socket id of a user joining a room
+  // stream = stream object from navigator.mediaDevices.getUserMedia
   function createPeer(userToSignal, callerId, stream) {
     const peer = new Peer({
       initiator: true,
@@ -85,6 +89,9 @@ function Session() {
     return peer;
   }
 
+  // incomingSignal = signal object from user joining a room
+  // callerId = socket id of a user joining a room
+  // stream = stream object from navigator.mediaDevices.getUserMedia
   function addPeer(incomingSignal, callerId, stream) {
     const peer = new Peer({
       initiator: false,
