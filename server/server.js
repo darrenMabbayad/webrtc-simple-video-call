@@ -17,8 +17,9 @@ io.on("connection", (socket) => {
     const usersInThisRoom = users[roomId].filter(
       (userId) => userId !== socket.id
     );
-
     socketToRoom[socket.id] = roomId;
+    console.log(users);
+    console.log(usersInThisRoom);
     socket.emit("get all users", usersInThisRoom);
   });
 
@@ -43,12 +44,12 @@ io.on("connection", (socket) => {
   socket.on("disconnect", () => {
     const roomId = socketToRoom[socket.id];
     let room = users[roomId];
-    console.log(`${socket.id} disconnected from room: ${roomId}`);
     if (room) {
       users[roomId] = room.filter((id) => id !== socket.id);
       const usersInThisRoom = users[roomId].filter(
         (userId) => userId !== socket.id
       );
+      console.log(users);
       console.log(usersInThisRoom);
       socket.emit("get all users", usersInThisRoom);
     }
