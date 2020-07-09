@@ -15,7 +15,6 @@ function Session() {
     navigator.mediaDevices
       .getUserMedia({ video: false, audio: true })
       .then((stream) => {
-        console.log(stream);
         if (userStreamRef.current) {
           userStreamRef.current.srcObject = stream;
         }
@@ -34,7 +33,7 @@ function Session() {
               peerId: user,
               peer: userInRoom,
             });
-            peerList.push(userInRoom);
+            peerList.push({ peerId: user, peer: userInRoom });
           });
           setPeers(peerList);
         });
@@ -48,7 +47,10 @@ function Session() {
             peerId: callerId,
             peer: userToAdd,
           });
-          setPeers((usersInRoom) => [...usersInRoom, userToAdd]);
+          setPeers((usersInRoom) => [
+            ...usersInRoom,
+            { peerId: callerId, peer: userToAdd },
+          ]);
         });
 
         // after the users already in the room send their own signal to the person joining
@@ -62,6 +64,20 @@ function Session() {
             item.peer.signal(userInRoomSignal);
           }
         );
+
+        // server sends back a list of users to rerender (list includes socket id of each user)
+        // search through peersRef and compare each peerId in peersRef with the socket id sent by server
+        // set new list of users to rerender in state
+        socket.on("rerender all users", (users) => {
+          const rerenderedUsers = [];
+          users.forEach((userId) => {
+            const userToRerender = peersRef.current.find(
+              (peer) => peer.peerId === userId
+            );
+            if (userToRerender) rerenderedUsers.push(userToRerender);
+          });
+          setPeers(rerenderedUsers);
+        });
       })
       .catch((error) => console.error(error));
 
@@ -116,12 +132,12 @@ function Session() {
     <div>
       <div>
         <img src={thorn} alt="" />
-        {/* <audio autoPlay ref={userStreamRef} /> */}
+        <audio autoPlay ref={userStreamRef} />
       </div>
       {peers.map((peer, index) => (
         <div key={index}>
           <img src={lumina} alt="" />
-          {/* <Audio peer={peer} /> */}
+          <Audio peer={peer.peer} />
         </div>
       ))}
     </div>

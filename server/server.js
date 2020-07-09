@@ -47,6 +47,7 @@ io.on("connection", (socket) => {
       const usersInThisRoom = users[roomId].filter(
         (userId) => userId !== socket.id
       );
+      io.emit("rerender all users", usersInThisRoom);
     }
   });
 });
