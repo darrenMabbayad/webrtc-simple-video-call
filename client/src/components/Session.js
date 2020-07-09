@@ -8,7 +8,6 @@ function Session() {
   const [peers, setPeers] = useState([]);
   const userStreamRef = useRef();
   const peersRef = useRef([]);
-  console.log(peers);
 
   useEffect(() => {
     const { room } = JSON.parse(localStorage.getItem("session"));
@@ -16,7 +15,10 @@ function Session() {
     navigator.mediaDevices
       .getUserMedia({ video: false, audio: true })
       .then((stream) => {
-        userStreamRef.current.srcObject = stream;
+        console.log(stream);
+        if (userStreamRef.current) {
+          userStreamRef.current.srcObject = stream;
+        }
 
         socket.emit("join room", room);
 
@@ -27,7 +29,7 @@ function Session() {
           const peerList = [];
           userList.forEach((user) => {
             // in this case, user = socket id of the user already in a room
-            const userInRoom = createPeer(user, socket.id, stream);
+            const userInRoom = createPeer(user, socket.id);
             peersRef.current.push({
               peerId: user,
               peer: userInRoom,
@@ -41,7 +43,7 @@ function Session() {
         // create a newPeer object for the new person in the call and push the new user's id and their peer object into peersRef
         // add the new user to the peers state variable to render them onto the screen
         socket.on("new user joined", ({ callerSignal, callerId }) => {
-          const userToAdd = addPeer(callerSignal, callerId, stream);
+          const userToAdd = addPeer(callerSignal, callerId);
           peersRef.current.push({
             peerId: callerId,
             peer: userToAdd,
@@ -114,12 +116,12 @@ function Session() {
     <div>
       <div>
         <img src={thorn} alt="" />
-        <audio autoPlay ref={userStreamRef} />
+        {/* <audio autoPlay ref={userStreamRef} /> */}
       </div>
       {peers.map((peer, index) => (
         <div key={index}>
           <img src={lumina} alt="" />
-          <Audio peer={peer} />
+          {/* <Audio peer={peer} /> */}
         </div>
       ))}
     </div>

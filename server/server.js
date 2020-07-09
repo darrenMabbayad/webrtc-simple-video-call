@@ -18,8 +18,6 @@ io.on("connection", (socket) => {
       (userId) => userId !== socket.id
     );
     socketToRoom[socket.id] = roomId;
-    console.log(users);
-    console.log(usersInThisRoom);
     socket.emit("get all users", usersInThisRoom);
   });
 
@@ -49,9 +47,6 @@ io.on("connection", (socket) => {
       const usersInThisRoom = users[roomId].filter(
         (userId) => userId !== socket.id
       );
-      console.log(users);
-      console.log(usersInThisRoom);
-      socket.emit("get all users", usersInThisRoom);
     }
   });
 });
